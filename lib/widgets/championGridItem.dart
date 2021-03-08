@@ -17,31 +17,38 @@ class ChampionGridTile extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: 1,
-              child: Image.network(
-                champion.squareImage,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, image, loading) {
-                  if (loading == null) return image;
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(4), topRight: Radius.circular(4)),
+                child: Image.network(
+                  champion.squareImage,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, image, loading) {
+                    if (loading == null) return image;
 
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                },
-                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                  if (wasSynchronouslyLoaded ?? false) {
-                    return child;
-                  }
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                  frameBuilder:
+                      (context, child, frame, wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded ?? false) {
+                      return child;
+                    }
 
-                  return AnimatedOpacity(
-                    child: child,
-                    opacity: frame == null ? 0 : 1,
-                    duration: const Duration(seconds: 1),
-                    curve: Curves.easeOut,
-                  );
-                },
+                    return AnimatedOpacity(
+                      child: child,
+                      opacity: frame == null ? 0 : 1,
+                      duration: const Duration(seconds: 1),
+                      curve: Curves.easeOut,
+                    );
+                  },
+                ),
               ),
             ),
+            SizedBox(height: 8),
             Text(champion.name),
+            SizedBox(height: 8),
           ],
         ),
       ),

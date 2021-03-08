@@ -6,16 +6,33 @@ import 'package:riot_api/models/champion.dart';
 
 class DataDragonApi extends GetxController {
   final String _domain = 'ddragon.leagueoflegends.com';
+
   String _version;
   String _language = 'pt_BR';
 
-  set setVersion(String value) {
-    _version = value;
+  final _championsList = List<ChampionListItem>.empty(growable: true);
+
+  List<ChampionListItem> get listChampions => _championsList;
+
+  String get version => _version;
+
+  ChampionListItem getChampionListItem(int index) {
+    return _championsList[index];
   }
 
-  String get getVersion => _version;
+  Future<String> getVersion() async {
+    final response = await http.get(
+      Uri.http(_domain, "/api/versions.json"),
+    );
 
-  Future<List<ChampionListItem>> getAllChampions() async {
+    final listVersions = List<String>.from(json.decode(response.body));
+
+    _version = listVersions[0];
+
+    return _version;
+  }
+
+  Future<void> getAllChampions() async {
     final response = await http.get(
       Uri.http(_domain,
           '/cdn/' + _version + '/data/' + _language + '/champion.json'),
@@ -23,15 +40,10 @@ class DataDragonApi extends GetxController {
 
     final body = Map<String, dynamic>.from(json.decode(response.body));
 
-    final List<ChampionListItem> championsList =
-        List<ChampionListItem>.empty(growable: true);
-
     Map.from(body['data']).forEach((key, value) {
       final champion = new ChampionListItem.fromJson(value);
-      championsList.add(champion);
+      _championsList.add(champion);
     });
-
-    return championsList;
   }
 
   Future<Champion> getChampion(String championId) async {

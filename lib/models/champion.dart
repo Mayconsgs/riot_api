@@ -1,3 +1,6 @@
+import 'package:get/get.dart';
+import 'package:riot_api/stores/riotApiStore.dart';
+
 class _Champion {
   String _id;
   String _key;
@@ -33,58 +36,58 @@ class _Champion {
     _blurb = champion['blurb'];
 
     _info = _Info(Map.from(champion['info']));
-    _image = _Image(Map.from(champion['image']));
+    _image = _Image(champion['image']);
 
     _tags = List.from(champion['tags']);
     _partype = champion['partype'];
-    _stats = _Stats(Map.from(champion['stats']));
+    _stats = _Stats(champion['stats']);
   }
 }
 
 class _Stats {
-  double _hp;
-  double _hpperlevel;
-  double _mp;
-  double _mpperlevel;
-  double _movespeed;
-  double _armor;
-  double _armorperlevel;
-  double _spellblock;
-  double _spellblockperlevel;
-  double _attackrange;
-  double _hpregen;
-  double _hpregenperlevel;
-  double _mpregen;
-  double _mpregenperlevel;
-  double _crit;
-  double _critperlevel;
-  double _attackdamage;
-  double _attackdamageperlevel;
-  double _attackspeedperlevel;
-  double _attackspeed;
+  var _hp;
+  var _hpperlevel;
+  var _mp;
+  var _mpperlevel;
+  var _movespeed;
+  var _armor;
+  var _armorperlevel;
+  var _spellblock;
+  var _spellblockperlevel;
+  var _attackrange;
+  var _hpregen;
+  var _hpregenperlevel;
+  var _mpregen;
+  var _mpregenperlevel;
+  var _crit;
+  var _critperlevel;
+  var _attackdamage;
+  var _attackdamageperlevel;
+  var _attackspeedperlevel;
+  var _attackspeed;
 
-  double get hp => _hp;
-  double get hpperlevel => _hpperlevel;
-  double get mp => _mp;
-  double get mpperlevel => _mpperlevel;
-  double get movespeed => _movespeed;
-  double get armor => _armor;
-  double get armorperlevel => _armorperlevel;
-  double get spellblock => _spellblock;
-  double get spellblockperlevel => _spellblockperlevel;
-  double get attackrange => _attackrange;
-  double get hpregen => _hpregen;
-  double get hpregenperlevel => _hpregenperlevel;
-  double get mpregen => _mpregen;
-  double get mpregenperlevel => _mpregenperlevel;
-  double get crit => _crit;
-  double get critperlevel => _critperlevel;
-  double get attackdamage => _attackdamage;
-  double get attackdamageperlevel => _attackdamageperlevel;
-  double get attackspeedperlevel => _attackspeedperlevel;
-  double get attackspeed => _attackspeed;
+  get hp => _hp;
+  get hpperlevel => _hpperlevel;
+  get mp => _mp;
+  get mpperlevel => _mpperlevel;
+  get movespeed => _movespeed;
+  get armor => _armor;
+  get armorperlevel => _armorperlevel;
+  get spellblock => _spellblock;
+  get spellblockperlevel => _spellblockperlevel;
+  get attackrange => _attackrange;
+  get hpregen => _hpregen;
+  get hpregenperlevel => _hpregenperlevel;
+  get mpregen => _mpregen;
+  get mpregenperlevel => _mpregenperlevel;
+  get crit => _crit;
+  get critperlevel => _critperlevel;
+  get attackdamage => _attackdamage;
+  get attackdamageperlevel => _attackdamageperlevel;
+  get attackspeedperlevel => _attackspeedperlevel;
+  get attackspeed => _attackspeed;
 
-  _Stats(Map<String, double> statsData) {
+  _Stats(Map<String, dynamic> statsData) {
     _hp = statsData['hp'];
     _hpperlevel = statsData['hpperlevel'];
     _mp = statsData['mp'];
@@ -114,16 +117,35 @@ class _Info {
   int _magic;
   int _difficulty;
 
-  get attack => _attack;
-  get defense => _defense;
-  get magic => _magic;
-  get difficulty => _difficulty;
+  int get attack => _attack;
+  int get defense => _defense;
+  int get magic => _magic;
+  int get difficulty => _difficulty;
 
   _Info(Map<String, int> infoData) {
     _attack = infoData['attack'];
     _defense = infoData['defense'];
     _magic = infoData['magic'];
     _difficulty = infoData['difficulty'];
+  }
+}
+
+class _Skin {
+  String _id;
+  int _num;
+  String _name;
+  bool _chromas;
+
+  String get id => _id;
+  int get num => _num;
+  String get name => _name;
+  bool get chromas => _chromas;
+
+  _Skin(Map<String, dynamic> skinData) {
+    _id = skinData['id'];
+    _num = skinData['num'];
+    _name = skinData['name'];
+    _chromas = skinData['chromas'];
   }
 }
 
@@ -167,7 +189,7 @@ class _Passive {
   _Passive(Map<String, dynamic> passiveData) {
     _name = passiveData['name'];
     _description = passiveData['description'];
-    _image = _Image(Map.from(passiveData['image']));
+    _image = _Image(passiveData['image']);
   }
 }
 
@@ -180,7 +202,7 @@ class _Spell {
   _LevelTip _leveltip;
   int _maxrank;
 
-  List<double> _cooldown;
+  List _cooldown;
   String _cooldownBurn;
 
   List<int> _cost;
@@ -188,7 +210,7 @@ class _Spell {
 
   Map _datavalues;
 
-  List<List<int>> _effect;
+  List<List> _effect = List<List>.empty(growable: true);
   List<String> _effectBurn;
 
   List _vars;
@@ -212,7 +234,7 @@ class _Spell {
   _LevelTip get leveltip => _leveltip;
   int get maxrank => _maxrank;
 
-  List<double> get cooldown => _cooldown;
+  List get cooldown => _cooldown;
   String get cooldownBurn => _cooldownBurn;
 
   List<int> get cost => _cost;
@@ -253,7 +275,9 @@ class _Spell {
 
     _datavalues = Map.from(spellData['datavalues']);
 
-    // _effect = List.from(spellData['effect']);
+    List.from(spellData['effect']).forEach((element) {
+      if (element != null) _effect.add(List.from(element));
+    });
 
     _effectBurn = List.from(spellData['effectBurn']);
 
@@ -274,19 +298,21 @@ class _Spell {
 
 class _LevelTip {
   List<String> _label;
-  // List<String> _effect;
+  List<String> _effect;
 
   List<String> get label => _label;
-  // List<String> get effect => _effect;
+  List<String> get effect => _effect;
 
   _LevelTip(Map<String, List> levelTipData) {
     _label = List.from(levelTipData['label']);
-    // _effect = List.from(levelTipData['effect']);
+    _effect = List.from(levelTipData['effect']);
   }
 }
 
 class Champion extends _Champion {
-  List<Map<String, dynamic>> _skins;
+  final DataDragonApi dataDragonApi = Get.find();
+
+  List<_Skin> _skins = List<_Skin>.empty(growable: true);
   String _lore;
 
   List<String> _allytips;
@@ -295,7 +321,7 @@ class Champion extends _Champion {
   _Passive _passive;
   List<_Spell> _spells = List<_Spell>.empty(growable: true);
 
-  List<Map<String, dynamic>> get skins => _skins;
+  List<_Skin> get skins => _skins;
   String get lore => _lore;
 
   List<String> get allytips => _allytips;
@@ -304,10 +330,21 @@ class Champion extends _Champion {
   _Passive get passive => _passive;
   List<_Spell> get spells => _spells;
 
+  String get squareImage =>
+      'http://ddragon.leagueoflegends.com/cdn/' +
+      dataDragonApi.version +
+      '/img/champion/' +
+      _image.full;
+
+  String getSplashArt(int index) =>
+      'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/' +
+      _id +
+      '_' +
+      _skins[index]._num.toString() +
+      '.jpg';
+
   Champion.fromJson(Map<String, dynamic> champion)
       : super.championFromJson(champion) {
-    _skins = List.from(champion['skins']);
-
     _lore = champion['lore'].toString();
     _allytips = List.from(champion['allytips']);
     _enemytips = List.from(champion['enemytips']);
@@ -315,6 +352,10 @@ class Champion extends _Champion {
 
     List.from(champion['spells']).forEach((element) {
       _spells.add(_Spell(Map.from(element)));
+    });
+
+    List.from(champion['skins']).forEach((element) {
+      _skins.add(_Skin(element));
     });
   }
 }
