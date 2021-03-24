@@ -1,6 +1,11 @@
 import 'package:get/get.dart';
 import 'package:riot_api/stores/riotApiStore.dart';
 
+final DataDragonApi _dataDragonApi = Get.find();
+
+const _domain = 'ddragon.leagueoflegends.com';
+final _version = _dataDragonApi.version;
+
 class _Champion {
   String _id;
   String _key;
@@ -8,8 +13,8 @@ class _Champion {
   String _title;
   String _blurb;
 
-  _Info _info;
-  _Image _image;
+  ChampionInfo _info;
+  RiotImage _image;
 
   List<String> _tags;
   String _partype;
@@ -21,8 +26,8 @@ class _Champion {
   String get title => _title;
   String get blurb => _blurb;
 
-  _Info get info => _info;
-  _Image get image => _image;
+  ChampionInfo get info => _info;
+  RiotImage get image => _image;
 
   List<String> get tags => _tags;
   String get partype => _partype;
@@ -35,8 +40,8 @@ class _Champion {
     _title = champion['title'];
     _blurb = champion['blurb'];
 
-    _info = _Info(Map.from(champion['info']));
-    _image = _Image(champion['image']);
+    _info = ChampionInfo(Map.from(champion['info']));
+    _image = RiotImage(champion['image']);
 
     _tags = List.from(champion['tags']);
     _partype = champion['partype'];
@@ -111,7 +116,7 @@ class _Stats {
   }
 }
 
-class _Info {
+class ChampionInfo {
   int _attack;
   int _defense;
   int _magic;
@@ -122,7 +127,7 @@ class _Info {
   int get magic => _magic;
   int get difficulty => _difficulty;
 
-  _Info(Map<String, int> infoData) {
+  ChampionInfo(Map<String, int> infoData) {
     _attack = infoData['attack'];
     _defense = infoData['defense'];
     _magic = infoData['magic'];
@@ -149,7 +154,7 @@ class _Skin {
   }
 }
 
-class _Image {
+class RiotImage {
   String _full;
   String _sprite;
   String _group;
@@ -166,7 +171,7 @@ class _Image {
   int get w => _w;
   int get h => _h;
 
-  _Image(Map<String, dynamic> championImageData) {
+  RiotImage(Map<String, dynamic> championImageData) {
     _full = championImageData['full'];
     _sprite = championImageData['sprite'];
     _group = championImageData['group'];
@@ -178,22 +183,24 @@ class _Image {
 }
 
 class _Passive {
+
   String _name;
   String _description;
-  _Image _image;
+  RiotImage _image;
 
   String get name => _name;
   String get description => _description;
-  _Image get image => _image;
+  RiotImage get image => _image;
 
   _Passive(Map<String, dynamic> passiveData) {
     _name = passiveData['name'];
     _description = passiveData['description'];
-    _image = _Image(passiveData['image']);
+    _image = RiotImage(passiveData['image']);
   }
 }
 
 class _Spell {
+
   String _id;
   String _name;
   String _description;
@@ -222,7 +229,7 @@ class _Spell {
   List<int> _range;
   String _rangeBurn;
 
-  _Image _image;
+  RiotImage _image;
 
   String _resource;
 
@@ -254,9 +261,13 @@ class _Spell {
   List<int> get range => _range;
   String get rangeBurn => _rangeBurn;
 
-  _Image get image => _image;
+  RiotImage get image => _image;
 
   String get resource => _resource;
+
+  String getSpellAsset() {
+    return 'http://$_domain/cdn/$_version/img/spell/${_image._full}';
+  }
 
   _Spell(Map<String, dynamic> spellData) {
     _id = spellData['id'];
@@ -290,7 +301,7 @@ class _Spell {
     _range = List.from(spellData['range']);
     _rangeBurn = spellData['rangeBurn'];
 
-    _image = _Image(Map.from(spellData['image']));
+    _image = RiotImage(Map.from(spellData['image']));
 
     _resource = spellData['resource'];
   }
@@ -310,7 +321,6 @@ class _LevelTip {
 }
 
 class Champion extends _Champion {
-  final DataDragonApi dataDragonApi = Get.find();
 
   List<_Skin> _skins = List<_Skin>.empty(growable: true);
   String _lore;
@@ -331,21 +341,18 @@ class Champion extends _Champion {
   List<_Spell> get spells => _spells;
 
   String get squareImage =>
-      'http://ddragon.leagueoflegends.com/cdn/' +
-      dataDragonApi.version +
-      '/img/champion/' +
-      _image.full;
+      'http://$_domain/cdn/$_version/img/champion/${_image.full}';
 
   String getSplashArt(int index) =>
-      'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/' +
-      _id +
-      '_' +
-      _skins[index]._num.toString() +
-      '.jpg';
+      'http://$_domain/cdn/img/champion/splash/${_id}_${_skins[index]._num}.jpg';
+
+  String getPassiveAsset() {
+    return 'http://$_domain/cdn/$_version/img/passive/${_passive._image._full}';
+  }
 
   Champion.fromJson(Map<String, dynamic> champion)
       : super.championFromJson(champion) {
-    _lore = champion['lore'].toString();
+    _lore = champion['lore'];
     _allytips = List.from(champion['allytips']);
     _enemytips = List.from(champion['enemytips']);
     _passive = _Passive(Map.from(champion['passive']));
@@ -362,8 +369,11 @@ class Champion extends _Champion {
 
 class ChampionListItem extends _Champion {
   String get squareImage =>
-      'http://ddragon.leagueoflegends.com/cdn/11.5.1/img/champion/' +
+      'http://ddragon.leagueoflegends.com/cdn/$_version/img/champion/' +
       _image.full;
+
+  String getLoadingImage(int index) =>
+      'http://ddragon.leagueoflegends.com/cdn/img/champion/loading/${_id}_$index.jpg';
 
   ChampionListItem.fromJson(Map<String, dynamic> champion)
       : super.championFromJson(champion);

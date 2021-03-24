@@ -14,18 +14,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Flutter Demo',
+      title: 'League of Legends',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.dark,
       home: FutureBuilder<String>(
-        future: dataDragonApi.getVersion(),
+        future: dataDragonApi.getInitialData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
               return Scaffold(
                 body: Center(
-                  child: Text('Algo deu errado!'),
+                  child: Text(snapshot.error.toString()),
                 ),
               );
             }
